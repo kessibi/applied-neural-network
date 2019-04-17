@@ -26,6 +26,12 @@ class DataLib:
         np.random.shuffle(data)
 
     @staticmethod
+    def writeToCSV(error,epoch):
+        with open("../out.csv", "a") as myfile:
+            myfile.write(str(epoch)+" "+str("{0:.3f}".format(error))+"\n")
+
+
+    @staticmethod
     def exportCSV():
         print("exporting CSV")
 

@@ -3,10 +3,6 @@
 import numpy as np
 import math
 
-# IMPORTANT NOTE: lines & columns may be inverted in all the following
-# functions. For now, I have just translated the java code of TP4 in 
-# python.
-
 class NNLib:
     @staticmethod
     def tanh(Z):
@@ -66,11 +62,12 @@ class NNLib:
 
     @staticmethod
     def crossEntropy(yHat,y):
-        K = y.size # number of classes
+        K = y.shape[0]
+        batchSize = len(yHat[0])
         cost = 0.0
-        batchSize = yHat.shape[0]
-        for c in range(batchSize):
-            for i in range(K):
-                cost += y[c][i]*math.log(yHat[c][i])
-        
-        return -(1/batchSize)*cost
+        for k in range(K):
+            for c in range(batchSize):
+                cost += y[k][c]*math.log(yHat[k][c])
+        return -(1.0/batchSize)*cost
+
+

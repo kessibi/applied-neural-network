@@ -28,14 +28,13 @@ class NeuralNet:
         self.X_test = np.empty([self.batchSize,self.nbFeatures])
         self.Y_test = np.empty([self.batchSize,self.nbClasses])
 
-        self.result = 0;
+        self.result = 0
+        self.falsePos = 0
+        self.falseNeg = 0
+        self.truePos = 0
+        self.trueNeg = 0
 
-# IMPORTANT NOTE: lines & columns may be inverted in all the following
-# functions. For now, I have just translated the java code of TP4 in 
-# python.
-
-    
-    #done, not tested
+    #done
     # if label = 0 then one-hot = (1,0)
     # if label = 1 then one-hot = (0,1)
     def createOneHot(self,k,indexInBatch,Y):
@@ -51,7 +50,7 @@ class NeuralNet:
     def shuffleTainingData(self):
         np.random.shuffle(self.trainingData)
 
-    # done, not tested
+    # done
     def loadAttributesAndLabels(self,dataSet,X,Y,dataIndex,batchSize):
         i = 0
         indexInBatch = dataIndex%batchSize
@@ -82,19 +81,25 @@ class NeuralNet:
             A2 = NNLib.softMax(Z2)
 
             # testing if the result matches
+            # TODO: coutn falsePos, falseNeg etc...
             if abs(self.Y_test[0][0] - A2[0][0]) <= 0.5:
                 self.result += 1
             # print otherwise for information purposes
             else:
+                print("WRONG PREDICTION:")
                 print(self.Y_test[0])
-                print("Label trouvé: "+str(A2))
+                print("Label founded: "+str(A2))
                 print("")
             
             seenTestingData += self.batchSize
 
-        print(self.result)
-        print(self.testingData.shape[0])
-        print(str(self.result/self.testingData.shape[0]) + "%")
+        print("TOTAL OF CORRECT PREDICITIONS: " + str(self.result))
+        print("TOTAL OF PREDICITIONS: " + str(self.testingData.shape[0]))
+        print("PERCENTAGE OF CORRECT PREDICITIONS: " + str((self.result/self.testingData.shape[0])*100) + " %")
+        print("FALSE POSITIVES : " + str(self.falsePos))
+        print("FALSE NEGATIVES : " + str(self.falseNeg))
+        print("TRUE POSITIVES : " + str(self.truePos))
+        print("TRUE NEGATIVES : " + str(self.trueNeg))
 
     # done
     def trainingEpoch(self):
@@ -137,15 +142,17 @@ class NeuralNet:
 
             seenTrainingData += self.batchSize
 
-        # return self.testPredicition()
+        return trainingError
 
-    # done, not tested
+    # done
     def train(self,nbEpoch):
         trainingProgress = ""
         for e in range(nbEpoch):
             if e % 100 == 0:
                 print(" Epoch "+str(e))
-            self.trainingEpoch()
+            error = self.trainingEpoch()
+            # writes error with epoch number into new CSV to make gnuplot graph
+            DataLib.writeToCSV(error,e)
             #trainingProgress += str(e) + "," + self.trainingEpoch() + "\n"
         print("Testing the model with the testingData\n")
         self.testPredicition()

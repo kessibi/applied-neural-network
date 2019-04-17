@@ -12,7 +12,8 @@ def main():
     
     dataNorm = DataLib.normalizeData(data,np.array([0,3,4,7,9,11]))
     
-    # Firsy
+    # second argument = batchSize
+    # third argument = number of classes
     nn = NeuralNet(dataNorm,1,2)
 
     nn.train(500)
