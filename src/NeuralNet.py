@@ -17,7 +17,8 @@ class NeuralNet:
         self.trainingSize = (int)(0.75*self.nbInstances)
         self.testingSize = self.nbInstances - self.trainingSize
         self.trainingData = data[0:self.trainingSize][:]
-        self.testingData = data[self.trainingSize:self.nbInstances][:]
+        #self.testingData = data[self.trainingSize:self.nbInstances][:]
+        self.testingData = data
         self.W1 = np.random.rand(self.nbFeatures,5)
         self.W2 = np.random.rand(5,self.nbClasses)
         self.b1 = np.full((1,5),0.0)
@@ -91,6 +92,8 @@ class NeuralNet:
             
             seenTestingData += self.batchSize
 
+        print(self.result)
+        print(self.testingData.shape[0])
         print(str(self.result/self.testingData.shape[0]) + "%")
 
     # done
