@@ -63,32 +63,25 @@ class NeuralNet:
         cost = 0.0
         countPredicitions = 0
 
-        self.loadAttributesAndLabels(self.testingData,self.X_test,self.Y_test,1,self.batchSize)
-        print(self.Y_test)
-        Z1 = (self.X_test @ self.W1) + self.b1
-        A1 = NNLib.tanh(Z1)
-        Z2 = (A1 @ self.W2) + self.b2
-        A2 = NNLib.softMax(Z2)
+        seenTestingData = 0
+        offset = 0
 
-        print("Label trouvé: "+str(A2))
+        while seenTestingData<self.testingData.shape[0]:
+            for i in range(self.batchSize):
+                self.loadAttributesAndLabels(self.testingData,self.X_test,self.Y_test,offset+i,self.batchSize)
+            offset += self.batchSize
 
-        # seenTestingData = 0
-        # offset = 0
+            print(self.Y_test)
 
-        # while seenTestingData<self.testingData.shape[0]:
-        #     for i in range(self.batchSize):
-        #         self.loadAttributesAndLabels(self.testingData,self.X_test,self.Y_test,offset+i,self.batchSize)
-        #     offset += self.batchSize
+            #Forward propagation
+            Z1 = np.add(np.dot(self.X_test,self.W1),self.b1)
+            A1 = NNLib.tanh(Z1)
+            Z2 = np.add(np.dot(A1,self.W2),self.b2)
+            A2 = NNLib.softMax(Z2)
 
-        #     #Forward propagation
-        #     Z1 = np.add(np.dot(self.X_test,self.W1),self.b1)
-        #     A1 = NNLib.tanh(Z1)
-        #     Z2 = np.add(np.dot(A1,self.W2),self.b2)
-        #     A2 = NNLib.softMax(Z2)
+            print("Label trouvé: "+str(A2))
 
-        #     print("Passe avant")
-
-        #     seenTestingData += self.batchSize
+            seenTestingData += self.batchSize
 
 
     # done
@@ -132,7 +125,7 @@ class NeuralNet:
 
             seenTrainingData += self.batchSize
 
-        return self.testPredicition()
+        # return self.testPredicition()
 
     # done, not tested
     def train(self,nbEpoch):
@@ -141,6 +134,8 @@ class NeuralNet:
             print(" Epoch "+str(e))
             self.trainingEpoch()
             #trainingProgress += str(e) + "," + self.trainingEpoch() + "\n"
+        print("Testing the model with the testingData\n")
+        self.testPredicition()
         DataLib.exportCSV()
 
 

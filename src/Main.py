@@ -14,7 +14,7 @@ def main():
     # Firsy
     nn = NeuralNet(dataNorm,1,2)
 
-    nn.train(100)
+    nn.train(500)
 
 
 if __name__ == "__main__":
