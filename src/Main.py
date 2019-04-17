@@ -13,7 +13,7 @@ def main():
     dataNorm = DataLib.normalizeData(data,np.array([0,3,4,7,9,11]))
     
     # Firsy
-    nn = NeuralNet(dataNorm,1,2)
+    nn = NeuralNet(dataNorm,1,2,1)
 
     nn.train(500)
 

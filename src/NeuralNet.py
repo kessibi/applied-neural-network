@@ -8,12 +8,13 @@ from NNLib import NNLib
 class NeuralNet:
     eta = 0.01
 
-    def __init__(self,data,batchsize,K):
+    def __init__(self,data,batchsize,K, hiddenlayers):
         self.nbInstances = data.shape[0]
         self.nbFeatures = data.shape[1]-1
         self.batchSize = batchsize
         self.nbClasses = K
         self.trainingData = data
+        self.hiddenLayers = hiddenlayers
         self.trainingSize = (int)(0.75*self.nbInstances)
         self.testingSize = self.nbInstances - self.trainingSize
         self.trainingData = data[0:self.trainingSize][:]
@@ -21,6 +22,14 @@ class NeuralNet:
         self.testingData = data
         self.W1 = np.random.rand(self.nbFeatures,5)
         self.W2 = np.random.rand(5,self.nbClasses)
+        
+        self.W = [np.random.rand(self.nbFeatures, 5)]
+        self.W = self.W + [np.random.rand(5,5)] * (self.hiddenLayers - 1)
+        self.W = self.W + [np.random.rand(5,self.nbClasses)]
+        
+        self.b = [np.full((1,5),0.0)] * self.hiddenLayers
+        self.b = self.b + [np.full((1,2),0.0)]
+
         self.b1 = np.full((1,5),0.0)
         self.b2 = np.full((1,2),0.0)
         self.X_train = np.empty([self.batchSize,self.nbFeatures])
@@ -61,7 +70,7 @@ class NeuralNet:
         self.createOneHot((int)(dataSet[dataIndex][i]),indexInBatch,Y)
     
     # not finished
-    def testPredicition(self):
+    def testPrediction(self):
         currentDataIndex = 0
         cost = 0.0
         countPredicitions = 0
@@ -109,7 +118,16 @@ class NeuralNet:
             for i in range(self.batchSize):
                 self.loadAttributesAndLabels(self.trainingData,self.X_train,self.Y_train,offset+i,self.batchSize)
             offset += self.batchSize
-            
+
+            Z = []
+            A = []
+
+            for i in range(self.hiddenLayers+1):
+                if i == 0:
+                    Z.append((self.X_train @ self.W[i]) + self.b[i])
+                else:
+                    Z.append((self.W[i-1] @ self.W[i]) + self.b[i])
+
             #Forward propagation
             Z1 = (self.X_train @ self.W1) + self.b1
             A1 = NNLib.tanh(Z1)
@@ -137,7 +155,7 @@ class NeuralNet:
 
             seenTrainingData += self.batchSize
 
-        # return self.testPredicition()
+        # return self.testPrediction()
 
     # done, not tested
     def train(self,nbEpoch):
@@ -148,7 +166,7 @@ class NeuralNet:
             self.trainingEpoch()
             #trainingProgress += str(e) + "," + self.trainingEpoch() + "\n"
         print("Testing the model with the testingData\n")
-        self.testPredicition()
+        self.testPrediction()
         DataLib.exportCSV()
 
 
