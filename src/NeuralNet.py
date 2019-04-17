@@ -27,6 +27,8 @@ class NeuralNet:
         self.X_test = np.empty([self.batchSize,self.nbFeatures])
         self.Y_test = np.empty([self.batchSize,self.nbClasses])
 
+        self.result = 0;
+
 # IMPORTANT NOTE: lines & columns may be inverted in all the following
 # functions. For now, I have just translated the java code of TP4 in 
 # python.
@@ -71,7 +73,6 @@ class NeuralNet:
                 self.loadAttributesAndLabels(self.testingData,self.X_test,self.Y_test,offset+i,self.batchSize)
             offset += self.batchSize
 
-            print(self.Y_test)
 
             #Forward propagation
             Z1 = np.add(np.dot(self.X_test,self.W1),self.b1)
@@ -79,10 +80,18 @@ class NeuralNet:
             Z2 = np.add(np.dot(A1,self.W2),self.b2)
             A2 = NNLib.softMax(Z2)
 
-            print("Label trouvé: "+str(A2))
-
+            # testing if the result matches
+            if abs(self.Y_test[0][0] - A2[0][0]) <= 0.5:
+                self.result += 1
+            # print otherwise for information purposes
+            else:
+                print(self.Y_test[0])
+                print("Label trouvé: "+str(A2))
+                print("")
+            
             seenTestingData += self.batchSize
 
+        print(str(self.result/self.testingData.shape[0]) + "%")
 
     # done
     def trainingEpoch(self):
@@ -131,7 +140,8 @@ class NeuralNet:
     def train(self,nbEpoch):
         trainingProgress = ""
         for e in range(nbEpoch):
-            print(" Epoch "+str(e))
+            if e % 100 == 0:
+                print(" Epoch "+str(e))
             self.trainingEpoch()
             #trainingProgress += str(e) + "," + self.trainingEpoch() + "\n"
         print("Testing the model with the testingData\n")
