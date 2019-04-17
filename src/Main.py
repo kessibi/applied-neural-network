@@ -8,6 +8,8 @@ from NNLib import NNLib
 
 def main():
     data = DataLib.csvToArray("../heart_disease_dataset.csv")
+    DataLib.shuffleData(data)
+    print(data) 
     
     dataNorm = DataLib.normalizeData(data,np.array([0,3,4,7,9,11]))
     

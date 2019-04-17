@@ -21,10 +21,10 @@ class DataLib:
         
         return data_norm
 
-    def shuffleData(self,data):
-        nbInstances = data.shape[0]
-        nbFeatures = data.shape[1]
-    
+    @staticmethod
+    def shuffleData(data):
+        np.random.shuffle(data)
+
     @staticmethod
     def exportCSV():
         print("exporting CSV")
