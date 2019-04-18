@@ -19,3 +19,6 @@ hs_err_pid*
 
 #Following for mac
 **.DS_Store
+
+#
+out.csv

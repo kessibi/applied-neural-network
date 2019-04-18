@@ -10,6 +10,9 @@ import argparse
 
 def main():
 
+    if len(sys.argv) == 1:
+        print("usage: python3.7 Main.py -h")
+        sys.exit(1)
     # Argument parser
     parser = argparse.ArgumentParser(description='Neural network for heart disease.')
     parser.add_argument('--epoch', help='number of epochs')
