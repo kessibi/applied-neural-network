@@ -26,7 +26,7 @@ class NeuralNet:
         self.W = [np.random.rand(self.nbFeatures, 5)]
         self.W = self.W + [np.random.rand(5,5)] * (self.hiddenLayers - 1)
         self.W = self.W + [np.random.rand(5,self.nbClasses)]
-        
+
         self.b = [np.full((1,5),0.0)] * self.hiddenLayers
         self.b = self.b + [np.full((1,2),0.0)]
 
@@ -121,21 +121,31 @@ class NeuralNet:
 
             Z = []
             A = []
+            delta = []
+            dW = []
+            db = []
 
             for i in range(self.hiddenLayers+1):
                 if i == 0:
                     Z.append((self.X_train @ self.W[i]) + self.b[i])
                 else:
-                    Z.append((self.W[i-1] @ self.W[i]) + self.b[i])
+                    Z.append((A[i-1] @ self.W[i]) + self.b[i])
+                
+                if i != self.hiddenLayers:
+                    A.append(NNLib.tanh(Z[i]))
+                else:
+                    A.append(NNLib.softMax(Z[i]))
+                    trainingError = NNLib.crossEntropy(A[i],self.Y_train)
+            
 
             #Forward propagation
             Z1 = (self.X_train @ self.W1) + self.b1
             A1 = NNLib.tanh(Z1)
             Z2 = (A1 @ self.W2) + self.b2
             A2 = NNLib.softMax(Z2)
-
+            
             #Error calculation
-            trainingError = NNLib.crossEntropy(A2,self.Y_train)
+            #trainingError = NNLib.crossEntropy(A2,self.Y_train)
 
             #Retropropagation of error
             delta2 = A2 - self.Y_train
@@ -145,7 +155,7 @@ class NeuralNet:
             delta1 = (delta2 @ np.transpose(self.W2)) * NNLib.tanhDeriv(Z1)
             dW1 = np.transpose(self.X_train) @ delta1
             db1 = delta1
-
+            
             #Parameters update
             self.W2 = self.W2 - self.eta*dW2
             self.b2 = self.b2 - self.eta*db2
