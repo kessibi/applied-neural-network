@@ -154,12 +154,21 @@ class NeuralNet:
                     delta.append(A[self.hiddenLayers] - self.Y_train)
                 else:
                     delta.append(delta[i-1] @ np.transpose(self.W[self.hiddenLayers - i - 1]) * NNLib.tanhDeriv(Z[self.hiddenLayers - i]))
+                db.append(delta[i])
                 
                 if i != self.hiddenLayers:
                     dW.append(np.transpose(A[self.hiddenLayers - i]) @ delta[i])
                 else:
                     dW.append(np.transpose(self.X_train) @ delta[i])
+            
 
+            print(self.W[1])
+            print(dW[0])
+
+            for i in range(self.hiddenLayers+1):
+                self.W[i] = self.W[i] - self.eta * dW[self.hiddenLayers - i]
+                self.b[i] = self.b[i] - self.eta * db[self.hiddenLayers - i]
+            
             #Retropropagation of error
             delta2 = A2 - self.Y_train
             dW2 = np.transpose(A1) @ delta2
