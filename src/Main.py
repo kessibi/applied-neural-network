@@ -12,6 +12,7 @@ def main():
 
     # Argument parser
     parser = argparse.ArgumentParser(description='Neural network for heart disease.')
+    parser.add_argument('--epoch', help='number of epochs')
     parser.add_argument('--batchsize', help='size of batches')
     parser.add_argument('--nhlayers', help='number of hidden layers')
     parser.add_argument('--hlayerssizes', nargs='+', help='sizes of hidden layers')
@@ -32,7 +33,7 @@ def main():
     # fourth argument = number of hidden layers
     nn = NeuralNet(dataNorm,int(args.batchsize),2,int(args.nhlayers),sizes)
 
-    nn.train(500)
+    nn.train(int(args.epoch))
 
 
 if __name__ == "__main__":
