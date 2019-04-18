@@ -25,8 +25,8 @@ class NNLib:
     def reluDeriv(A):
         C = np.full((A.shape[0],A.shape[1]),0.0)
         
-        for i in range(Z.shape[0]):
-            for j in range(Z.shape[1]):
+        for i in range(A.shape[0]):
+            for j in range(A.shape[1]):
                 C[i][j] = 1.0 if A[i][j]>0 else 0.0
         
         return C
@@ -62,12 +62,12 @@ class NNLib:
 
     @staticmethod
     def crossEntropy(yHat,y):
-        K = y.shape[0]
-        batchSize = len(yHat[0])
+        K = y.shape[1]
+        batchSize = y.shape[0]
         cost = 0.0
-        for k in range(K):
-            for c in range(batchSize):
-                cost += y[k][c]*math.log(yHat[k][c])
+        for c in range(batchSize):
+            for k in range(K):
+                cost += y[c][k]*math.log(yHat[c][k])
         return -(1.0/batchSize)*cost
 
 

@@ -28,14 +28,9 @@ class DataLib:
     @staticmethod
     def writeToCSV(error,epoch):
         with open("../out.csv", "a") as myfile:
-            myfile.write(str(epoch)+" "+str("{0:.3f}".format(error))+"\n")
+            myfile.write(str(epoch)+" "+str(error)+"\n")
 
 
     @staticmethod
     def exportCSV():
         print("exporting CSV")
-
-
-
-# parser = DataLib()
-# print(parser.csvToArray("heart_disease_dataset.csv").shape[1])

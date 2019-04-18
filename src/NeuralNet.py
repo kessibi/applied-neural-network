@@ -75,31 +75,46 @@ class NeuralNet:
 
 
             #Forward propagation
-            Z1 = np.add(np.dot(self.X_test,self.W1),self.b1)
-            A1 = NNLib.tanh(Z1)
-            Z2 = np.add(np.dot(A1,self.W2),self.b2)
+            Z1 = (self.X_test @ self.W1) + self.b1
+            A1 = NNLib.relu(Z1)
+            Z2 = (A1 @ self.W2) + self.b2
             A2 = NNLib.softMax(Z2)
 
             # testing if the result matches
             # TODO: coutn falsePos, falseNeg etc...
-            if abs(self.Y_test[0][0] - A2[0][0]) <= 0.5:
+            # (1,0) = not sick, (0,1) = sick
+            if self.Y_test[0][0]==1 and A2[0][0]>=0.5 :
                 self.result += 1
-            # print otherwise for information purposes
+                self.trueNeg += 1
+            elif self.Y_test[0][1]==1  and A2[0][1]>=0.5 :
+                self.result += 1
+                self.truePos += 1
+            elif self.Y_test[0][0]==0 and A2[0][0]>=0.5 :
+                self.falseNeg += 1
             else:
-                print("WRONG PREDICTION:")
-                print(self.Y_test[0])
-                print("Label founded: "+str(A2))
-                print("")
+                self.falsePos += 1
+
+
+            # if abs(self.Y_test[0][0] - A2[0][0]) <= 0.5:
+            #     self.result += 1
+            # # print otherwise for information purposes
+            # else:
+            #     print("WRONG PREDICTION:")
+            #     print(self.Y_test[0])
+            #     print("Label founded: "+str(A2))
+            #     print("")
             
             seenTestingData += self.batchSize
 
-        print("TOTAL OF CORRECT PREDICITIONS: " + str(self.result))
-        print("TOTAL OF PREDICITIONS: " + str(self.testingData.shape[0]))
-        print("PERCENTAGE OF CORRECT PREDICITIONS: " + str((self.result/self.testingData.shape[0])*100) + " %")
-        print("FALSE POSITIVES : " + str(self.falsePos))
-        print("FALSE NEGATIVES : " + str(self.falseNeg))
+        print("TOTAL OF CORRECT PREDICTIONS: " + str(self.result))
+        print("TOTAL OF PREDICTIONS: " + str(self.testingData.shape[0]))
+        print("PERCENTAGE OF CORRECT PREDICTIONS: " + str((self.result/self.testingData.shape[0])*100) + " %")
         print("TRUE POSITIVES : " + str(self.truePos))
         print("TRUE NEGATIVES : " + str(self.trueNeg))
+        print("FALSE POSITIVES : " + str(self.falsePos))
+        print("FALSE NEGATIVES : " + str(self.falseNeg))
+        if self.truePos + self.trueNeg + self.falsePos + self.falseNeg == self.testingData.shape[0]:
+            print("NUMBERS MATCHES")
 
     # done
     def trainingEpoch(self):
@@ -158,10 +173,3 @@ class NeuralNet:
         self.testPredicition()
         DataLib.exportCSV()
 
-
-
-#csv = DataLib()
-#nn = NeuralNet(csv.csvToArray("../heart_disease_dataset.csv"),2,4)
-#print(nn.trainingData)
-#print(nn.testingData)
-#nn.train(10)
