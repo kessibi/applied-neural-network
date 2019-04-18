@@ -83,7 +83,6 @@ class NeuralNet:
                 self.loadAttributesAndLabels(self.testingData,self.X_test,self.Y_test,offset+i,self.batchSize)
             offset += self.batchSize
 
-
             #Forward propagation
             Z1 = np.add(np.dot(self.X_test,self.W1),self.b1)
             A1 = NNLib.tanh(Z1)
@@ -157,17 +156,12 @@ class NeuralNet:
                 db.append(delta[i])
                 
                 if i != self.hiddenLayers:
-                    dW.append(np.transpose(A[self.hiddenLayers - i]) @ delta[i])
+                    dW.append(np.transpose(A[self.hiddenLayers - i - 1]) @ delta[i])
                 else:
                     dW.append(np.transpose(self.X_train) @ delta[i])
             
 
-            print(self.W[1])
-            print(dW[0])
 
-            for i in range(self.hiddenLayers+1):
-                self.W[i] = self.W[i] - self.eta * dW[self.hiddenLayers - i]
-                self.b[i] = self.b[i] - self.eta * db[self.hiddenLayers - i]
             
             #Retropropagation of error
             delta2 = A2 - self.Y_train
@@ -184,6 +178,10 @@ class NeuralNet:
 
             self.W1 = self.W1 - self.eta*dW1
             self.b1 = self.b1 - self.eta*db1
+            
+            for i in range(self.hiddenLayers+1):
+                self.W[i] = self.W[i] - self.eta * dW[self.hiddenLayers - i]
+                self.b[i] = self.b[i] - self.eta * db[self.hiddenLayers - i]
 
             seenTrainingData += self.batchSize
 
