@@ -62,12 +62,16 @@ class NNLib:
 
     @staticmethod
     def crossEntropy(yHat,y):
-        K = y.shape[1]
+        # print(yHat)
+        # print(y)
+        # K = y.shape[1]
         batchSize = y.shape[0]
         cost = 0.0
-        for c in range(batchSize):
-            for k in range(K):
-                cost += y[c][k]*math.log(yHat[c][k])
+        cost = y[0][0]*math.log(yHat[0][0]) + y[0][1]*math.log(yHat[0][1])
+        #for c in range(batchSize):
+        #    for k in range(K):
+        #        cost += y[c][k]*math.log(yHat[c][k])
+        # print("COST :"+str(-cost))
         return -(1.0/batchSize)*cost
 
 

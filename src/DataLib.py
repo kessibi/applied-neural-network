@@ -18,7 +18,6 @@ class DataLib:
             sd = math.sqrt(np.var(data[:,columns[i]])) #standard deviation of the column number[i]
             for j in range(data.shape[0]):
                 data_norm[j][columns[i]] = (data[j][columns[i]]-m)/sd
-        
         return data_norm
 
     @staticmethod

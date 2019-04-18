@@ -17,8 +17,8 @@ class NeuralNet:
         self.trainingSize = (int)(0.75*self.nbInstances)
         self.testingSize = self.nbInstances - self.trainingSize
         self.trainingData = data[0:self.trainingSize][:]
-        #self.testingData = data[self.trainingSize:self.nbInstances][:]
-        self.testingData = data
+        self.testingData = data[self.trainingSize:self.nbInstances][:]
+        # self.testingData = data
         self.W1 = np.random.rand(self.nbFeatures,5)
         self.W2 = np.random.rand(5,self.nbClasses)
         self.b1 = np.full((1,5),0.0)
@@ -33,6 +33,8 @@ class NeuralNet:
         self.falseNeg = 0
         self.truePos = 0
         self.trueNeg = 0
+
+        self.errors = []
 
     #done
     # if label = 0 then one-hot = (1,0)
@@ -70,8 +72,9 @@ class NeuralNet:
 
         while seenTestingData<self.testingData.shape[0]:
             for i in range(self.batchSize):
-                self.loadAttributesAndLabels(self.testingData,self.X_test,self.Y_test,offset+i,self.batchSize)
+                self.loadAttributesAndLabels(self.testingData,self.X_test,self.Y_test,offset+i,self.batchSize)           
             offset += self.batchSize
+
 
 
             #Forward propagation
@@ -122,6 +125,7 @@ class NeuralNet:
         trainingError = 0.0
         testingError = 0.0
         offset = 0
+        self.error = []
         
         self.shuffleTainingData()
 
@@ -138,6 +142,7 @@ class NeuralNet:
 
             #Error calculation
             trainingError = NNLib.crossEntropy(A2,self.Y_train)
+            self.errors = np.append(self.errors,trainingError)
 
             #Retropropagation of error
             delta2 = A2 - self.Y_train
@@ -157,7 +162,7 @@ class NeuralNet:
 
             seenTrainingData += self.batchSize
 
-        return trainingError
+        return np.mean(self.errors)
 
     # done
     def train(self,nbEpoch):
