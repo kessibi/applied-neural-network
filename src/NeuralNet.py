@@ -20,8 +20,6 @@ class NeuralNet:
         self.trainingData = data[0:self.trainingSize][:]
         #self.testingData = data[self.trainingSize:self.nbInstances][:]
         self.testingData = data
-        self.W1 = np.random.rand(self.nbFeatures,5)
-        self.W2 = np.random.rand(5,self.nbClasses)
         
         self.W = [np.random.rand(self.nbFeatures, 5)]
         self.W = self.W + [np.random.rand(5,5)] * (self.hiddenLayers - 1)
@@ -30,8 +28,6 @@ class NeuralNet:
         self.b = [np.full((1,5),0.0)] * self.hiddenLayers
         self.b = self.b + [np.full((1,2),0.0)]
 
-        self.b1 = np.full((1,5),0.0)
-        self.b2 = np.full((1,2),0.0)
         self.X_train = np.empty([self.batchSize,self.nbFeatures])
         self.Y_train = np.empty([self.batchSize,self.nbClasses])
         self.X_test = np.empty([self.batchSize,self.nbFeatures])
@@ -83,19 +79,29 @@ class NeuralNet:
                 self.loadAttributesAndLabels(self.testingData,self.X_test,self.Y_test,offset+i,self.batchSize)
             offset += self.batchSize
 
+            Z = []
+            A = []
+
             #Forward propagation
-            Z1 = np.add(np.dot(self.X_test,self.W1),self.b1)
-            A1 = NNLib.tanh(Z1)
-            Z2 = np.add(np.dot(A1,self.W2),self.b2)
-            A2 = NNLib.softMax(Z2)
+            for i in range(self.hiddenLayers+1):
+                if i == 0:
+                    Z.append(np.add(np.dot(self.X_test,self.W[0]),self.b[0]))
+                else:
+                    Z.append(np.add(np.dot(A[i-1],self.W[1]),self.b[1]))
+                
+                if i == self.hiddenLayers:
+                    A.append(NNLib.softMax(Z[i]))
+                else:
+                    A.append(NNLib.tanh(Z[i]))
+
 
             # testing if the result matches
-            if abs(self.Y_test[0][0] - A2[0][0]) <= 0.5:
+            if abs(self.Y_test[0][0] - A[self.hiddenLayers][0][0]) <= 0.5:
                 self.result += 1
             # print otherwise for information purposes
             else:
                 print(self.Y_test[0])
-                print("Label trouvé: "+str(A2))
+                print("Label trouvé: "+str(A[self.hiddenLayers]))
                 print("")
             
             seenTestingData += self.batchSize
@@ -124,6 +130,7 @@ class NeuralNet:
             dW = []
             db = []
 
+            #Forward propagation
             for i in range(self.hiddenLayers+1):
                 if i == 0:
                     Z.append((self.X_train @ self.W[i]) + self.b[i])
@@ -135,19 +142,10 @@ class NeuralNet:
                 else:
                     A.append(NNLib.softMax(Z[i]))
                     
-                    #Error calculation
+                    #Error computing
                     trainingError = NNLib.crossEntropy(A[i],self.Y_train)
             
-
-            #Forward propagation
-            Z1 = (self.X_train @ self.W1) + self.b1
-            A1 = NNLib.tanh(Z1)
-            Z2 = (A1 @ self.W2) + self.b2
-            A2 = NNLib.softMax(Z2)
-            
-            #Error calculation
-            #trainingError = NNLib.crossEntropy(A2,self.Y_train)
-            
+            #Retropropagation of error
             for i in range(self.hiddenLayers+1):
                 if i == 0:
                     delta.append(A[self.hiddenLayers] - self.Y_train)
@@ -163,22 +161,7 @@ class NeuralNet:
 
 
             
-            #Retropropagation of error
-            delta2 = A2 - self.Y_train
-            dW2 = np.transpose(A1) @ delta2
-            db2 = delta2
-
-            delta1 = (delta2 @ np.transpose(self.W2)) * NNLib.tanhDeriv(Z1)
-            dW1 = np.transpose(self.X_train) @ delta1
-            db1 = delta1
-            
             #Parameters update
-            self.W2 = self.W2 - self.eta*dW2
-            self.b2 = self.b2 - self.eta*db2
-
-            self.W1 = self.W1 - self.eta*dW1
-            self.b1 = self.b1 - self.eta*db1
-            
             for i in range(self.hiddenLayers+1):
                 self.W[i] = self.W[i] - self.eta * dW[self.hiddenLayers - i]
                 self.b[i] = self.b[i] - self.eta * db[self.hiddenLayers - i]
