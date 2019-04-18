@@ -150,7 +150,8 @@ class NeuralNet:
                 if i == 0:
                     delta.append(A[self.hiddenLayers] - self.Y_train)
                 else:
-                    delta.append(delta[i-1] @ np.transpose(self.W[self.hiddenLayers - i - 1]) * NNLib.tanhDeriv(Z[self.hiddenLayers - i]))
+                    delta.append(delta[i-1] @ np.transpose(self.W[self.hiddenLayers - i + 1]) * NNLib.tanhDeriv(Z[self.hiddenLayers - i]))
+                
                 db.append(delta[i])
                 
                 if i != self.hiddenLayers:
