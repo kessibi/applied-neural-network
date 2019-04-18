@@ -87,7 +87,7 @@ class NeuralNet:
                 if i == 0:
                     Z.append(np.add(np.dot(self.X_test,self.W[0]),self.b[0]))
                 else:
-                    Z.append(np.add(np.dot(A[i-1],self.W[1]),self.b[1]))
+                    Z.append(np.add(np.dot(A[i-1],self.W[i]),self.b[i]))
                 
                 if i == self.hiddenLayers:
                     A.append(NNLib.softMax(Z[i]))
