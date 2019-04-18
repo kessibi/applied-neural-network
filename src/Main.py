@@ -1,7 +1,8 @@
 #!/usr/bin/python
 
 import numpy as np
-import sys
+import sys, os
+
 #np.set_printoptions(threshold=np.nan)
 from DataLib import DataLib
 from NeuralNet import NeuralNet
@@ -28,6 +29,9 @@ def main():
     data = DataLib.csvToArray("../heart_disease_dataset.csv")
     DataLib.shuffleData(data)
     dataNorm = DataLib.normalizeData(data,np.array([0,3,4,7,9,11]))
+
+    if os.path.exists("../out.csv"):
+        os.remove("../out.csv")
 
     #Neural network
     
