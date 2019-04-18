@@ -14,7 +14,8 @@ def main():
     
     # second argument = batchSize
     # third argument = number of classes
-    nn = NeuralNet(dataNorm,1,2)
+    # fourth argument = number of hidden layers
+    nn = NeuralNet(dataNorm,1,2,3,[5,7,5])
 
     nn.train(500)
 

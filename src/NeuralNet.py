@@ -8,21 +8,38 @@ from NNLib import NNLib
 class NeuralNet:
     eta = 0.01
 
-    def __init__(self,data,batchsize,K):
+    def __init__(self,data,batchsize,K, hiddenlayers, hiddenlayersizes):
         self.nbInstances = data.shape[0]
         self.nbFeatures = data.shape[1]-1
         self.batchSize = batchsize
         self.nbClasses = K
         self.trainingData = data
+        self.hiddenLayers = hiddenlayers
+        self.hiddenLayersSizes = hiddenlayersizes
         self.trainingSize = (int)(0.75*self.nbInstances)
         self.testingSize = self.nbInstances - self.trainingSize
         self.trainingData = data[0:self.trainingSize][:]
+
         self.testingData = data[self.trainingSize:self.nbInstances][:]
         # self.testingData = data
-        self.W1 = np.random.rand(self.nbFeatures,5)
-        self.W2 = np.random.rand(5,self.nbClasses)
-        self.b1 = np.full((1,5),0.0)
-        self.b2 = np.full((1,2),0.0)
+        for i in range(self.hiddenLayers+1):
+            if i==0:
+                self.W = [np.random.rand(self.nbFeatures,self.hiddenLayersSizes[0])]
+                self.b = [np.random.rand(self.batchSize,self.hiddenLayersSizes[0])]
+            elif i==self.hiddenLayers:
+                self.W = self.W + [np.random.rand(self.hiddenLayersSizes[i-1],self.nbClasses)]
+                self.b = self.b + [np.random.rand(self.batchSize,self.nbClasses)]
+            else:
+                self.W = self.W + [np.random.rand(self.hiddenLayersSizes[i-1],self.hiddenLayersSizes[i])]
+                self.b = self.b + [np.random.rand(self.batchSize,self.hiddenLayersSizes[i])]
+        
+        # to verify weight matrix sizes and bias matrix sizes
+        # for i in range(self.hiddenLayers+1):
+        #     print(self.W[i].shape)
+        
+        # for i in range(self.hiddenLayers+1):
+        #     print(self.b[i].shape)
+
         self.X_train = np.empty([self.batchSize,self.nbFeatures])
         self.Y_train = np.empty([self.batchSize,self.nbClasses])
         self.X_test = np.empty([self.batchSize,self.nbFeatures])
@@ -62,7 +79,7 @@ class NeuralNet:
         self.createOneHot((int)(dataSet[dataIndex][i]),indexInBatch,Y)
     
     # not finished
-    def testPredicition(self):
+    def testPrediction(self):
         currentDataIndex = 0
         cost = 0.0
         countPredicitions = 0
@@ -75,37 +92,44 @@ class NeuralNet:
                 self.loadAttributesAndLabels(self.testingData,self.X_test,self.Y_test,offset+i,self.batchSize)           
             offset += self.batchSize
 
+            Z = []
+            A = []
 
 
             #Forward propagation
-            Z1 = (self.X_test @ self.W1) + self.b1
-            A1 = NNLib.relu(Z1)
-            Z2 = (A1 @ self.W2) + self.b2
-            A2 = NNLib.softMax(Z2)
+
+            #Z1 = (self.X_test @ self.W1) + self.b1
+            #A1 = NNLib.relu(Z1)
+            #Z2 = (A1 @ self.W2) + self.b2
+            #A2 = NNLib.softMax(Z2)
 
             # testing if the result matches
             # TODO: coutn falsePos, falseNeg etc...
             # (1,0) = not sick, (0,1) = sick
-            if self.Y_test[0][0]==1 and A2[0][0]>=0.5 :
+
+            for i in range(self.hiddenLayers+1):
+                if i == 0:
+                    Z.append((self.X_test @ self.W[0]) + self.b[0])
+                else:
+                    Z.append((A[i-1] @ self.W[i]) + self.b[i])
+                
+                if i == self.hiddenLayers:
+                    A.append(NNLib.softMax(Z[i]))
+                else:
+                    A.append(NNLib.tanh(Z[i]))
+
+
+            # testing if the result matches
+            if self.Y_test[0][0]==1 and A[self.hiddenLayers][0][0]>=0.5:
                 self.result += 1
                 self.trueNeg += 1
-            elif self.Y_test[0][1]==1  and A2[0][1]>=0.5 :
+            elif self.Y_test[0][1]==1  and A[self.hiddenLayers][0][1]>=0.5 :
                 self.result += 1
                 self.truePos += 1
-            elif self.Y_test[0][0]==0 and A2[0][0]>=0.5 :
+            elif self.Y_test[0][0]==0 and A[self.hiddenLayers][0][0]>=0.5 :
                 self.falseNeg += 1
             else:
                 self.falsePos += 1
-
-
-            # if abs(self.Y_test[0][0] - A2[0][0]) <= 0.5:
-            #     self.result += 1
-            # # print otherwise for information purposes
-            # else:
-            #     print("WRONG PREDICTION:")
-            #     print(self.Y_test[0])
-            #     print("Label founded: "+str(A2))
-            #     print("")
             
             seenTestingData += self.batchSize
 
@@ -133,36 +157,56 @@ class NeuralNet:
             for i in range(self.batchSize):
                 self.loadAttributesAndLabels(self.trainingData,self.X_train,self.Y_train,offset+i,self.batchSize)
             offset += self.batchSize
-            
+
+            Z = []
+            A = []
+            delta = []
+            dW = []
+            db = []
+
             #Forward propagation
-            Z1 = (self.X_train @ self.W1) + self.b1
-            A1 = NNLib.tanh(Z1)
-            Z2 = (A1 @ self.W2) + self.b2
-            A2 = NNLib.softMax(Z2)
-
-            #Error calculation
-            trainingError = NNLib.crossEntropy(A2,self.Y_train)
-            self.errors = np.append(self.errors,trainingError)
-
+            for i in range(self.hiddenLayers+1):
+                if i == 0: # if first layer
+                    Z.append((self.X_train @ self.W[i]) + self.b[i])
+                else:
+                    Z.append((A[i-1] @ self.W[i]) + self.b[i])
+                
+                if i != self.hiddenLayers: # if hidden layer
+                    A.append(NNLib.tanh(Z[i]))
+                else: # if last layer
+                    A.append(NNLib.softMax(Z[i]))
+                    
+                    #Error computing
+                    trainingError = NNLib.crossEntropy(A[i],self.Y_train)
+                    self.errors = np.append(self.errors,trainingError)  
+            
             #Retropropagation of error
-            delta2 = A2 - self.Y_train
-            dW2 = np.transpose(A1) @ delta2
-            db2 = delta2
+            for i in range(self.hiddenLayers+1):
+                if i == 0: # if last layer
+                    delta.append(A[self.hiddenLayers] - self.Y_train)
+                else: # if hidden layer
+                    delta.append(delta[i-1] @ np.transpose(self.W[self.hiddenLayers - i + 1]) * NNLib.tanhDeriv(Z[self.hiddenLayers - i]))
+                
+                db.append(delta[i])
 
-            delta1 = (delta2 @ np.transpose(self.W2)) * NNLib.tanhDeriv(Z1)
-            dW1 = np.transpose(self.X_train) @ delta1
-            db1 = delta1
+                
+                if i != self.hiddenLayers:
+                    dW.append(np.transpose(A[self.hiddenLayers - i - 1]) @ delta[i])
+                else:
+                    dW.append(np.transpose(self.X_train) @ delta[i])
+            
 
+
+            
             #Parameters update
-            self.W2 = self.W2 - self.eta*dW2
-            self.b2 = self.b2 - self.eta*db2
-
-            self.W1 = self.W1 - self.eta*dW1
-            self.b1 = self.b1 - self.eta*db1
+            for i in range(self.hiddenLayers+1):
+                self.W[i] = self.W[i] - self.eta * dW[self.hiddenLayers - i]
+                self.b[i] = self.b[i] - self.eta * db[self.hiddenLayers - i]
 
             seenTrainingData += self.batchSize
 
         return np.mean(self.errors)
+
 
     # done
     def train(self,nbEpoch):
@@ -175,6 +219,6 @@ class NeuralNet:
             DataLib.writeToCSV(error,e)
             #trainingProgress += str(e) + "," + self.trainingEpoch() + "\n"
         print("Testing the model with the testingData\n")
-        self.testPredicition()
+        self.testPrediction()
         DataLib.exportCSV()
 
