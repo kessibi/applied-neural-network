@@ -135,6 +135,8 @@ class NeuralNet:
                     A.append(NNLib.tanh(Z[i]))
                 else:
                     A.append(NNLib.softMax(Z[i]))
+                    
+                    #Error calculation
                     trainingError = NNLib.crossEntropy(A[i],self.Y_train)
             
 
@@ -146,6 +148,17 @@ class NeuralNet:
             
             #Error calculation
             #trainingError = NNLib.crossEntropy(A2,self.Y_train)
+            
+            for i in range(self.hiddenLayers+1):
+                if i == 0:
+                    delta.append(A[self.hiddenLayers] - self.Y_train)
+                else:
+                    delta.append(delta[i-1] @ np.transpose(self.W[self.hiddenLayers - i - 1]) * NNLib.tanhDeriv(Z[self.hiddenLayers - i]))
+                
+                if i != self.hiddenLayers:
+                    dW.append(np.transpose(A[self.hiddenLayers - i]) @ delta[i])
+                else:
+                    dW.append(np.transpose(self.X_train) @ delta[i])
 
             #Retropropagation of error
             delta2 = A2 - self.Y_train
