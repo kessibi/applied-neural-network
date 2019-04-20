@@ -1,13 +1,11 @@
 #!/usr/bin/python
 
 import numpy as np
-import sys, os
+import sys, os, argparse
 
-#np.set_printoptions(threshold=np.nan)
 from DataLib import DataLib
 from NeuralNet import NeuralNet
 from NNLib import NNLib
-import argparse
 
 def main():
 
@@ -25,10 +23,15 @@ def main():
         parser.error('hlayerssizes lengths must be equal to nhlayers.')
     sizes = list(map(int, args.hlayerssizes))
 
+
     # Data processing
     data = DataLib.csvToArray("../heart_disease_dataset.csv")
     DataLib.shuffleData(data)
     dataNorm = DataLib.normalizeData(data,np.array([0,3,4,7,9,11]))
+
+    trainingSize = (int)(0.74*dataNorm.shape[0])
+    if(trainingSize%int(args.batchsize)!=0):
+        parser.error('batchsize must be a divisor of '+str(trainingSize)+" !")
 
     if os.path.exists("../out.csv"):
         os.remove("../out.csv")

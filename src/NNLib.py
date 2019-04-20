@@ -31,22 +31,22 @@ class NNLib:
         
         return C
     
-    # @staticmethod
-    # def softMax(Z):
-    #     softA = np.full((Z.shape[0],Z.shape[1]),0.0)
-    #     for i in range(softA.shape[0]): # for each instance in current batch
-    #         for k in range(softA.shape[1]): # for each class k
-    #             sum = 0.0
-    #             for c in range(softA.shape[1]):
-    #                 sum += math.exp(Z[i][c])
-    #             softA[i][k] = (float)(math.exp(Z[i][k]/sum))
-
-    #     return softA
-
     @staticmethod
-    def softMax(X):
-        exps = np.exp(X)
-        return exps / np.sum(exps)
+    def softMax(Z):
+        softA = np.full((Z.shape[0],Z.shape[1]),0.0)
+        for i in range(softA.shape[0]): # for each instance in current batch
+            for k in range(softA.shape[1]): # for each class k
+                sum = 0.0
+                for c in range(softA.shape[1]):
+                    sum += math.exp(Z[i][c])
+                softA[i][k] = (float)(math.exp(Z[i][k]/sum))
+
+        return softA
+
+    # @staticmethod
+    # def softMax(X):
+    #     exps = np.exp(X)
+    #     return exps / np.sum(exps)
     
     @staticmethod
     def checkPredictions(yHat,y,indexInBatch):
@@ -62,16 +62,12 @@ class NNLib:
 
     @staticmethod
     def crossEntropy(yHat,y):
-        # print(yHat)
-        # print(y)
-        # K = y.shape[1]
+        K = y.shape[1]
         batchSize = y.shape[0]
         cost = 0.0
-        cost = y[0][0]*math.log(yHat[0][0]) + y[0][1]*math.log(yHat[0][1])
-        #for c in range(batchSize):
-        #    for k in range(K):
-        #        cost += y[c][k]*math.log(yHat[c][k])
-        # print("COST :"+str(-cost))
+        for c in range(batchSize):
+           for k in range(K):
+               cost += y[c][k]*math.log(yHat[c][k])
         return -(1.0/batchSize)*cost
 
 

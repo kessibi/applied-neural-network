@@ -16,7 +16,7 @@ class NeuralNet:
         self.trainingData = data
         self.hiddenLayers = hiddenlayers
         self.hiddenLayersSizes = hiddenlayersizes
-        self.trainingSize = (int)(0.75*self.nbInstances)
+        self.trainingSize = (int)(0.74*self.nbInstances)
         self.testingSize = self.nbInstances - self.trainingSize
         self.trainingData = data[0:self.trainingSize][:]
 
@@ -86,23 +86,20 @@ class NeuralNet:
 
         seenTestingData = 0
         offset = 0
+        bSize = 1
 
         while seenTestingData<self.testingData.shape[0]:
-            for i in range(self.batchSize):
-                self.loadAttributesAndLabels(self.testingData,self.X_test,self.Y_test,offset+i,self.batchSize)           
-            offset += self.batchSize
+            for i in range(bSize):
+                self.loadAttributesAndLabels(self.testingData,self.X_test,self.Y_test,offset+i,bSize)           
+            # offset += self.batchSize
+            offset += bSize
 
             Z = []
+
             A = []
 
 
             #Forward propagation
-
-            #Z1 = (self.X_test @ self.W1) + self.b1
-            #A1 = NNLib.relu(Z1)
-            #Z2 = (A1 @ self.W2) + self.b2
-            #A2 = NNLib.softMax(Z2)
-
             # testing if the result matches
             # TODO: coutn falsePos, falseNeg etc...
             # (1,0) = not sick, (0,1) = sick
@@ -131,7 +128,8 @@ class NeuralNet:
             else:
                 self.falsePos += 1
             
-            seenTestingData += self.batchSize
+            # seenTestingData += self.batchSize
+            seenTestingData += bSize
 
         print("TOTAL OF CORRECT PREDICTIONS: " + str(self.result))
         print("TOTAL OF PREDICTIONS: " + str(self.testingData.shape[0]))
@@ -157,6 +155,7 @@ class NeuralNet:
             for i in range(self.batchSize):
                 self.loadAttributesAndLabels(self.trainingData,self.X_train,self.Y_train,offset+i,self.batchSize)
             offset += self.batchSize
+            seenTrainingData += self.batchSize
 
             Z = []
             A = []
@@ -203,7 +202,7 @@ class NeuralNet:
                 self.W[i] = self.W[i] - self.eta * dW[self.hiddenLayers - i]
                 self.b[i] = self.b[i] - self.eta * db[self.hiddenLayers - i]
 
-            seenTrainingData += self.batchSize
+            #seenTrainingData += self.batchSize
 
         return np.mean(self.errors)
 
