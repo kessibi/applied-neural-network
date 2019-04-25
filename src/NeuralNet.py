@@ -95,7 +95,6 @@ class NeuralNet:
             offset += bSize
 
             Z = []
-
             A = []
 
 
@@ -113,7 +112,7 @@ class NeuralNet:
                 if i == self.hiddenLayers:
                     A.append(NNLib.softMax(Z[i]))
                 else:
-                    A.append(NNLib.tanh(Z[i]))
+                    A.append(NNLib.relu(Z[i]))
 
 
             # testing if the result matches
@@ -134,10 +133,10 @@ class NeuralNet:
         print("TOTAL OF CORRECT PREDICTIONS: " + str(self.result))
         print("TOTAL OF PREDICTIONS: " + str(self.testingData.shape[0]))
         print("PERCENTAGE OF CORRECT PREDICTIONS: " + str((self.result/self.testingData.shape[0])*100) + " %")
-        print("TRUE POSITIVES : " + str(self.truePos))
-        print("TRUE NEGATIVES : " + str(self.trueNeg))
-        print("FALSE POSITIVES : " + str(self.falsePos))
-        print("FALSE NEGATIVES : " + str(self.falseNeg))
+        print("TRUE POSITIVES : " + str(self.truePos) + ", Percentage: "+str(self.truePos*100/self.testingData.shape[0])+ " %")
+        print("TRUE NEGATIVES : " + str(self.trueNeg) + ", Percentage: "+str(self.trueNeg*100/self.testingData.shape[0])+ " %")
+        print("FALSE POSITIVES : " + str(self.falsePos) + ", Percentage: "+str(self.falsePos*100/self.testingData.shape[0])+ " %")
+        print("FALSE NEGATIVES : " + str(self.falseNeg) + ", Percentage: "+str(self.falseNeg*100/self.testingData.shape[0])+ " %")
         if self.truePos + self.trueNeg + self.falsePos + self.falseNeg == self.testingData.shape[0]:
             print("NUMBERS MATCHES")
 
@@ -171,7 +170,7 @@ class NeuralNet:
                     Z.append((A[i-1] @ self.W[i]) + self.b[i])
                 
                 if i != self.hiddenLayers: # if hidden layer
-                    A.append(NNLib.tanh(Z[i]))
+                    A.append(NNLib.relu(Z[i]))
                 else: # if last layer
                     A.append(NNLib.softMax(Z[i]))
                     
@@ -184,7 +183,7 @@ class NeuralNet:
                 if i == 0: # if last layer
                     delta.append(A[self.hiddenLayers] - self.Y_train)
                 else: # if hidden layer
-                    delta.append(delta[i-1] @ np.transpose(self.W[self.hiddenLayers - i + 1]) * NNLib.tanhDeriv(Z[self.hiddenLayers - i]))
+                    delta.append(delta[i-1] @ np.transpose(self.W[self.hiddenLayers - i + 1]) * NNLib.reluDeriv(Z[self.hiddenLayers - i]))
                 
                 db.append(delta[i])
 
@@ -201,8 +200,6 @@ class NeuralNet:
             for i in range(self.hiddenLayers+1):
                 self.W[i] = self.W[i] - self.eta * dW[self.hiddenLayers - i]
                 self.b[i] = self.b[i] - self.eta * db[self.hiddenLayers - i]
-
-            #seenTrainingData += self.batchSize
 
         return np.mean(self.errors)
 
