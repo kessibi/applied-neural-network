@@ -112,7 +112,7 @@ class NeuralNet:
                 if i == self.hiddenLayers:
                     A.append(NNLib.softMax(Z[i]))
                 else:
-                    A.append(NNLib.relu(Z[i]))
+                    A.append(NNLib.tanh(Z[i]))
 
 
             # testing if the result matches
@@ -170,7 +170,7 @@ class NeuralNet:
                     Z.append((A[i-1] @ self.W[i]) + self.b[i])
                 
                 if i != self.hiddenLayers: # if hidden layer
-                    A.append(NNLib.relu(Z[i]))
+                    A.append(NNLib.tanh(Z[i]))
                 else: # if last layer
                     A.append(NNLib.softMax(Z[i]))
                     
@@ -183,7 +183,7 @@ class NeuralNet:
                 if i == 0: # if last layer
                     delta.append(A[self.hiddenLayers] - self.Y_train)
                 else: # if hidden layer
-                    delta.append(delta[i-1] @ np.transpose(self.W[self.hiddenLayers - i + 1]) * NNLib.reluDeriv(Z[self.hiddenLayers - i]))
+                    delta.append(delta[i-1] @ np.transpose(self.W[self.hiddenLayers - i + 1]) * NNLib.tanhDeriv(Z[self.hiddenLayers - i]))
                 
                 db.append(delta[i])
 
