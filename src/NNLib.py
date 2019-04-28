@@ -11,6 +11,14 @@ class NNLib:
     @staticmethod
     def tanhDeriv(A):
         return 1.0 - np.tanh(A)**2
+    
+    @staticmethod
+    def sigmoid(A):
+        return 1.0 / (1.0 + np.exp(-A))
+    
+    @staticmethod
+    def sigmoidDeriv(A):
+        return np.exp(-A)/pow(1.0 + np.exp(-A),2.0)
 
     @staticmethod
     def relu(Z):
