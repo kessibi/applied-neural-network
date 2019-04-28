@@ -80,10 +80,6 @@ class NeuralNet:
     
     # not finished
     def testPrediction(self):
-        currentDataIndex = 0
-        cost = 0.0
-        countPredicitions = 0
-
         seenTestingData = 0
         offset = 0
         bSize = 1
@@ -91,7 +87,6 @@ class NeuralNet:
         while seenTestingData<self.testingData.shape[0]:
             for i in range(bSize):
                 self.loadAttributesAndLabels(self.testingData,self.X_test,self.Y_test,offset+i,bSize)           
-            # offset += self.batchSize
             offset += bSize
 
             Z = []
@@ -100,7 +95,6 @@ class NeuralNet:
 
             #Forward propagation
             # testing if the result matches
-            # TODO: coutn falsePos, falseNeg etc...
             # (1,0) = not sick, (0,1) = sick
 
             for i in range(self.hiddenLayers+1):
@@ -127,7 +121,6 @@ class NeuralNet:
             else:
                 self.falsePos += 1
             
-            # seenTestingData += self.batchSize
             seenTestingData += bSize
 
         print("TOTAL OF CORRECT PREDICTIONS: " + str(self.result))
@@ -213,8 +206,5 @@ class NeuralNet:
             error = self.trainingEpoch()
             # writes error with epoch number into new CSV to make gnuplot graph
             DataLib.writeToCSV(error,e)
-            #trainingProgress += str(e) + "," + self.trainingEpoch() + "\n"
         print("Testing the model with the testingData\n")
         self.testPrediction()
-        DataLib.exportCSV()
-

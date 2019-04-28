@@ -30,6 +30,6 @@ class DataLib:
             myfile.write(str(epoch)+" "+str(error)+"\n")
 
 
-    @staticmethod
-    def exportCSV():
-        print("exporting CSV")
+    # @staticmethod
+    # def exportCSV():
+    #     print("exporting CSV")

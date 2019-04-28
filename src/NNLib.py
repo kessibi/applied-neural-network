@@ -42,23 +42,17 @@ class NNLib:
                 softA[i][k] = (float)(math.exp(Z[i][k]/sum))
 
         return softA
-
-    # @staticmethod
-    # def softMax(X):
-    #     exps = np.exp(X)
-    #     return exps / np.sum(exps)
     
-    @staticmethod
-    def checkPredictions(yHat,y,indexInBatch):
-        predK = 0
-        actualK = 0
-        for k in range(1,yHat.shape[0]):
-            if yHat[k][indexInBatch] > yHat[predK][indexInBatch]:
-                predK = k
-            if Y[k][indexInBatch] > yHat[actualK][indexInBatch]:
-                actualK = k
-        #print("Actual k: " + str(actualK) + " Predicted k: " + str(predK) + " (" + (actualK==predK) + ")")
-        return actualK==predK
+    # @staticmethod
+    # def checkPredictions(yHat,y,indexInBatch):
+    #     predK = 0
+    #     actualK = 0
+    #     for k in range(1,yHat.shape[0]):
+    #         if yHat[k][indexInBatch] > yHat[predK][indexInBatch]:
+    #             predK = k
+    #         if y[k][indexInBatch] > yHat[actualK][indexInBatch]:
+    #             actualK = k
+    #     return actualK==predK
 
     @staticmethod
     def crossEntropy(yHat,y):
