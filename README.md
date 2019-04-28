@@ -6,7 +6,7 @@ susceptible to contract a heart disease following Cleveland's model.
 
 ## How to use:
 
-`python3.7 Main.py --epoch 500 --batchsize 1 --nhlayers 2 --hlayerssize 5 5`
+`python3.7 Main.py --E 500 --B 1 --L 5 5`
 
-Feel free to change the number of epochs and the number of hidden layers
-`nhlayers` to something above or equal to 1.
+Feel free to change the number of epochs and the sizes of hidden layers
+`L` to something above or equal to 1.
