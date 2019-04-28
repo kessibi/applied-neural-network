@@ -127,8 +127,6 @@ class NeuralNet:
         print("TRUE NEGATIVES : " + str(self.trueNeg) + ", Percentage: "+str(self.trueNeg*100/self.testingData.shape[0])+ " %")
         print("FALSE POSITIVES : " + str(self.falsePos) + ", Percentage: "+str(self.falsePos*100/self.testingData.shape[0])+ " %")
         print("FALSE NEGATIVES : " + str(self.falseNeg) + ", Percentage: "+str(self.falseNeg*100/self.testingData.shape[0])+ " %")
-        if self.truePos + self.trueNeg + self.falsePos + self.falseNeg == self.testingData.shape[0]:
-            print("NUMBERS MATCHES")
 
     def trainingEpoch(self):
         seenTrainingData = 0
