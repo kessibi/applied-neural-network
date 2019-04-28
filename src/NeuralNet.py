@@ -21,6 +21,7 @@ class NeuralNet:
         self.trainingData = data[0:self.trainingSize][:]
 
         self.testingData = data[self.trainingSize:self.nbInstances][:]
+        # To test with the entire data
         # self.testingData = data
         for i in range(self.hiddenLayers+1):
             if i==0:
@@ -33,7 +34,7 @@ class NeuralNet:
                 self.W = self.W + [np.random.rand(self.hiddenLayersSizes[i-1],self.hiddenLayersSizes[i])]
                 self.b = self.b + [np.random.rand(self.batchSize,self.hiddenLayersSizes[i])]
         
-        # to verify weight matrix sizes and bias matrix sizes
+        ## To verify weight matrix sizes and bias matrix sizes
         # for i in range(self.hiddenLayers+1):
         #     print(self.W[i].shape)
         
@@ -53,7 +54,6 @@ class NeuralNet:
 
         self.errors = []
 
-    #done
     # if label = 0 then one-hot = (1,0)
     # if label = 1 then one-hot = (0,1)
     def createOneHot(self,k,indexInBatch,Y):
@@ -65,11 +65,9 @@ class NeuralNet:
             else:
                 Y[indexInBatch][i] = 0
     
-    #done
     def shuffleTainingData(self):
         np.random.shuffle(self.trainingData)
 
-    # done
     def loadAttributesAndLabels(self,dataSet,X,Y,dataIndex,batchSize):
         i = 0
         indexInBatch = dataIndex%batchSize
@@ -78,7 +76,6 @@ class NeuralNet:
         i += 1
         self.createOneHot((int)(dataSet[dataIndex][i]),indexInBatch,Y)
     
-    # not finished
     def testPrediction(self):
         seenTestingData = 0
         offset = 0
@@ -123,8 +120,8 @@ class NeuralNet:
             
             seenTestingData += bSize
 
-        print("TOTAL OF CORRECT PREDICTIONS: " + str(self.result))
         print("TOTAL OF PREDICTIONS: " + str(self.testingData.shape[0]))
+        print("TOTAL OF CORRECT PREDICTIONS: " + str(self.result))
         print("PERCENTAGE OF CORRECT PREDICTIONS: " + str((self.result/self.testingData.shape[0])*100) + " %")
         print("TRUE POSITIVES : " + str(self.truePos) + ", Percentage: "+str(self.truePos*100/self.testingData.shape[0])+ " %")
         print("TRUE NEGATIVES : " + str(self.trueNeg) + ", Percentage: "+str(self.trueNeg*100/self.testingData.shape[0])+ " %")
@@ -133,11 +130,9 @@ class NeuralNet:
         if self.truePos + self.trueNeg + self.falsePos + self.falseNeg == self.testingData.shape[0]:
             print("NUMBERS MATCHES")
 
-    # done
     def trainingEpoch(self):
         seenTrainingData = 0
         trainingError = 0.0
-        testingError = 0.0
         offset = 0
         self.error = []
         
@@ -167,7 +162,7 @@ class NeuralNet:
                 else: # if last layer
                     A.append(NNLib.softMax(Z[i]))
                     
-                    #Error computing
+                    #Error computation
                     trainingError = NNLib.crossEntropy(A[i],self.Y_train)
                     self.errors = np.append(self.errors,trainingError)  
             
@@ -180,14 +175,10 @@ class NeuralNet:
                 
                 db.append(delta[i])
 
-                
                 if i != self.hiddenLayers:
                     dW.append(np.transpose(A[self.hiddenLayers - i - 1]) @ delta[i])
                 else:
                     dW.append(np.transpose(self.X_train) @ delta[i])
-            
-
-
             
             #Parameters update
             for i in range(self.hiddenLayers+1):
@@ -196,8 +187,6 @@ class NeuralNet:
 
         return np.mean(self.errors)
 
-
-    # done
     def train(self,nbEpoch):
         trainingProgress = ""
         for e in range(nbEpoch):
@@ -206,5 +195,5 @@ class NeuralNet:
             error = self.trainingEpoch()
             # writes error with epoch number into new CSV to make gnuplot graph
             DataLib.writeToCSV(error,e)
-        print("Testing the model with the testingData\n")
+        print("\nTesting the model with the testingData:\n")
         self.testPrediction()
