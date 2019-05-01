@@ -1,4 +1,4 @@
-# applied-neural-network
+# artificial-neural-network
 
 ## What it is:
 Applying a neural network to heart disease data in order to predict who is
